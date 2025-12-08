@@ -1,6 +1,6 @@
-# TradeMaster - OMS
+# Trading - OMS
 ## Overview
-Order Management System (OMS) is part of TradeMaster project. More description .....
+Order Management System (OMS) is part of Trading project. More description .....
 
 ## To Run
 At current point of time, we have three big main components from docker compose perspective:

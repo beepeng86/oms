@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jre-alpine
 RUN addgroup -S spring && adduser -S spring -G spring
 
 # Copy the Spring Boot JAR to the /opt directory
-COPY /target/algo-engine-*.jar /opt/trademaster-algo.jar
+COPY /target/algo-engine-*.jar /opt/algo.jar
 
 # Set the non-root user as the default user
 USER spring:spring
@@ -14,7 +14,7 @@ USER spring:spring
 WORKDIR /opt
 
 # Define the entry point to run the Spring Boot application
-ENTRYPOINT ["java", "-jar", "trademaster-algo.jar"]
+ENTRYPOINT ["java", "-jar", "algo.jar"]
 
 # Expose the port to the external world
 EXPOSE 8080

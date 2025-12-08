@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jre-alpine
 RUN addgroup -S spring && adduser -S spring -G spring
 
 # Copy the Spring Boot JAR to the /opt directory
-COPY /target/oms-*.jar /opt/trademaster-oms.jar
+COPY /target/oms-*.jar /opt/oms.jar
 
 # Set the non-root user as the default user
 USER spring:spring
@@ -14,7 +14,7 @@ USER spring:spring
 WORKDIR /opt
 
 # Define the entry point to run the Spring Boot application
-ENTRYPOINT ["java", "-jar", "trademaster-oms.jar"]
+ENTRYPOINT ["java", "-jar", "oms.jar"]
 
 # Expose the port to the external world
 EXPOSE 8080
