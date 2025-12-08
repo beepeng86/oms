@@ -1,0 +1,67 @@
+@startuml
+
+autonumber
+
+actor user
+participant dashboard
+participant algoEngine
+database inventory as "Inventory"
+database balance as "Acc Balance"
+database openOrderList as "Order List"
+database orderBook as "orderBook\ndatasource"
+queue order_proposal
+participant OMS
+queue order_command
+queue order_event
+participant brokerageA
+participant brokerageB
+participant brokerageC
+
+user -> dashboard: place instruction\nBUY APPLE 1000
+dashboard -> algoEngine++: place instruction
+
+dashboard <- algoEngine--: return instruction\n placement\n successful\n or not
+user <- dashboard:
+
+inventory -> algoEngine: get account inventory
+balance -> algoEngine: get account balance
+openOrderList -> algoEngine: get order list
+orderBook -> algoEngine: get orderBook sync
+
+algoEngine -> algoEngine: while instruction remains\nalgo calculation
+
+algoEngine -> order_proposal: place order A 300
+algoEngine -> order_proposal: place order B 300
+algoEngine -> order_proposal: place order C 400
+
+order_proposal -> OMS++ : pickup account A's\norderProposal
+OMS -> openOrderList: create open order
+OMS -> inventory: book inventory
+OMS -> balance: freeze balance
+OMS -> order_command: send orderCommand\nto adapter
+
+order_command -> brokerageA: pickup orderCommand and call
+order_event <-- brokerageA: order placed\n OrderStatus=Pending
+OMS <- order_event: pickup response/update
+OMS -> openOrderList: change OrderStatus to Active
+order_event <-- brokerageA: order update OrderStatus=Partial filled
+OMS <- order_event: pickup response/update
+OMS -> balance: adjust balance\nunfreeze balance
+OMS -> inventory: adjust inventory\nunbook inventory
+OMS -> openOrderList: update executedQty\nand orderStatus
+order_event <-- brokerageA: order filled OrderStatus=Filled
+OMS <- order_event: pickup response/update
+OMS -> balance: adjust balance\nunfreeze balance
+OMS -> inventory: adjust inventory\nunbook inventory
+OMS -> openOrderList--: remove order from list
+
+order_proposal -> OMS++: pickup account B's\norderProposal
+OMS -> order_command: send orderCommand\nto adapter
+order_command -> brokerageB: place order
+OMS <- brokerageB--: place order (similar to A)
+
+order_proposal -> OMS++: pickup account C's\norderProposal
+order_command -> brokerageC--: place order (similar to A)
+
+
+@enduml

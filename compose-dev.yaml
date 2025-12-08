@@ -1,0 +1,66 @@
+services:
+  oms:
+#    build:
+#      context: .
+#      dockerfile: docker/oms/Dockerfile
+    image: beepeng86/oms
+    ports:
+      - "8081:8080"
+    volumes:
+      - /logs:/logs
+    environment:
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5479/dev01'
+      - 'SPRING_DATASOURCE_USERNAME=postgres'
+      - 'SPRING_DATASOURCE_PASSWORD=1234'
+      - 'SPRING_KAFKA_BOOTSTRAP-SERVERS=kafka1:19092'
+    depends_on:
+      - kafka1
+    networks:
+      - tnet
+#  algo:
+#    build:
+#      context: .
+#      dockerfile: docker/algoengine/Dockerfile
+#    image: beepeng86/algo
+#    ports:
+#      - "8082:8080"
+#    volumes:
+#      - /logs:/logs
+#    environment:
+##      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5467/dev01'
+##      - 'SPRING_DATASOURCE_USERNAME=postgres'
+##      - 'SPRING_DATASOURCE_PASSWORD=temp'
+#       - 'SPRING_KAFKA_BOOTSTRAP-SERVERS=kafka1:19092'
+#    depends_on:
+#      - oms
+#    networks:
+#      - tnet
+  kafka1:
+    image: confluentinc/cp-kafka
+    container_name: kafka1
+    hostname: kafka1
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+      - "9999:9999"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LISTENERS: 'INTERNAL://kafka1:19092,CONTROLLER://kafka1:29093,EXTERNAL://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://ec2-13-212-113-114.ap-southeast-1.compute.amazonaws.com:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:29093'
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      CLUSTER_ID: 'EBOTK6HeSHypKlRqaAcRqg'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    networks:
+      - tnet
+networks:
+  tnet:
+    name: tm-kafka-net
