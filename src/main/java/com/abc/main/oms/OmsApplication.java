@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@ConfigurationPropertiesScan({"com.abc.mainoms.config"})
+@ConfigurationPropertiesScan({"com.abc.main.oms.config"})
 @EntityScan({"com.abc.maincommon.model"})
 public class OmsApplication {
 
